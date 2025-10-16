@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color scheme to match NodeSeek's clean, professional aesthetic */
+  /* Updated color scheme to match NotSeek's clean, professional aesthetic */
   --background: oklch(0.99 0.005 106.423);
   --foreground: oklch(0.15 0.01 258.338);
   --card: oklch(1 0 0);

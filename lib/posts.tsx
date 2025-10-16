@@ -1,40 +1,58 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from "react"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  type ReactNode,
+} from "react";
 
 export interface Post {
-  id: string
-  title: string
-  content: string
-  topic: string
+  id: string;
+  title: string;
+  content: string;
+  topic: string;
   author: {
-    id: string
-    name: string
-    avatar: string
-  }
-  replyCount: number
-  viewCount: number
-  createdAt: string
-  updatedAt: string
-  isSticky?: boolean
-  isDraft?: boolean
+    id: string;
+    name: string;
+    avatar: string;
+  };
+  replyCount: number;
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
+  isSticky?: boolean;
+  isDraft?: boolean;
 }
 
 interface PostsState {
-  posts: Post[]
-  drafts: Post[]
-  addPost: (post: Omit<Post, "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount">) => void
-  updatePost: (id: string, updates: Partial<Post>) => void
-  deletePost: (id: string) => void
-  saveDraft: (draft: Omit<Post, "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount">) => void
-  deleteDraft: (id: string) => void
-  getPostById: (id: string) => Post | undefined
-  getPostsByTopic: (topic: string) => Post[]
-  incrementViewCount: (id: string) => void
-  searchPosts: (query: string) => Post[]
+  posts: Post[];
+  drafts: Post[];
+  addPost: (
+    post: Omit<
+      Post,
+      "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount"
+    >
+  ) => void;
+  updatePost: (id: string, updates: Partial<Post>) => void;
+  deletePost: (id: string) => void;
+  saveDraft: (
+    draft: Omit<
+      Post,
+      "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount"
+    >
+  ) => void;
+  deleteDraft: (id: string) => void;
+  getPostById: (id: string) => Post | undefined;
+  getPostsByTopic: (topic: string) => Post[];
+  incrementViewCount: (id: string) => void;
+  searchPosts: (query: string) => Post[];
 }
 
-const PostsContext = createContext<PostsState | undefined>(undefined)
+const PostsContext = createContext<PostsState | undefined>(undefined);
 
 const initialPosts: Post[] = [
   {
@@ -51,7 +69,7 @@ const initialPosts: Post[] = [
   },
   {
     id: "2",
-    title: "公告：NodeSeek启用DeepFlood社区优化计划",
+    title: "公告：NotSeek启用DeepFlood社区优化计划",
     content: "DeepFlood社区优化计划启动",
     topic: "info",
     author: { id: "2", name: "jkoy", avatar: "/user-jkoy.jpg" },
@@ -84,7 +102,7 @@ const initialPosts: Post[] = [
   },
   {
     id: "5",
-    title: "NodeSeek 新功能上线通知",
+    title: "NotSeek 新功能上线通知",
     content: "我们刚刚发布了一些新功能，包括更好的搜索体验和消息通知",
     topic: "info",
     author: { id: "5", name: "Si", avatar: "/user-si.jpg" },
@@ -162,7 +180,8 @@ const initialPosts: Post[] = [
   {
     id: "12",
     title: "Next.js 14 新特性详解和最佳实践",
-    content: "深入解析 Next.js 14 的新功能，包括 App Router 和 Server Components",
+    content:
+      "深入解析 Next.js 14 的新功能，包括 App Router 和 Server Components",
     topic: "tech",
     author: { id: "12", name: "toboo", avatar: "/user-toboo.jpg" },
     replyCount: 156,
@@ -225,46 +244,66 @@ const initialPosts: Post[] = [
     createdAt: "7小时前",
     updatedAt: "7小时前",
   },
-]
+];
 
 export function PostsProvider({ children }: { children: ReactNode }) {
-  const [posts, setPosts] = useState<Post[]>(initialPosts)
-  const [drafts, setDrafts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [drafts, setDrafts] = useState<Post[]>([]);
 
   useEffect(() => {
     // Clear old localStorage data to ensure we use the latest initialPosts
-    localStorage.removeItem("posts-storage")
-    setPosts(initialPosts)
-  }, [])
+    localStorage.removeItem("posts-storage");
+    setPosts(initialPosts);
+  }, []);
 
   // Save posts to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("posts-storage", JSON.stringify({ state: { posts, drafts } }))
-  }, [posts, drafts])
+    localStorage.setItem(
+      "posts-storage",
+      JSON.stringify({ state: { posts, drafts } })
+    );
+  }, [posts, drafts]);
 
-  const addPost = useCallback((postData: Omit<Post, "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount">) => {
-    const newPost: Post = {
-      ...postData,
-      id: Date.now().toString(),
-      createdAt: "刚刚",
-      updatedAt: "刚刚",
-      replyCount: 0,
-      viewCount: 0,
-      isDraft: false,
-    }
-    setPosts((prev) => [newPost, ...prev])
-  }, [])
+  const addPost = useCallback(
+    (
+      postData: Omit<
+        Post,
+        "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount"
+      >
+    ) => {
+      const newPost: Post = {
+        ...postData,
+        id: Date.now().toString(),
+        createdAt: "刚刚",
+        updatedAt: "刚刚",
+        replyCount: 0,
+        viewCount: 0,
+        isDraft: false,
+      };
+      setPosts((prev) => [newPost, ...prev]);
+    },
+    []
+  );
 
   const updatePost = useCallback((id: string, updates: Partial<Post>) => {
-    setPosts((prev) => prev.map((post) => (post.id === id ? { ...post, ...updates, updatedAt: "刚刚" } : post)))
-  }, [])
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === id ? { ...post, ...updates, updatedAt: "刚刚" } : post
+      )
+    );
+  }, []);
 
   const deletePost = useCallback((id: string) => {
-    setPosts((prev) => prev.filter((post) => post.id !== id))
-  }, [])
+    setPosts((prev) => prev.filter((post) => post.id !== id));
+  }, []);
 
   const saveDraft = useCallback(
-    (draftData: Omit<Post, "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount">) => {
+    (
+      draftData: Omit<
+        Post,
+        "id" | "createdAt" | "updatedAt" | "replyCount" | "viewCount"
+      >
+    ) => {
       const newDraft: Post = {
         ...draftData,
         id: Date.now().toString(),
@@ -273,39 +312,43 @@ export function PostsProvider({ children }: { children: ReactNode }) {
         replyCount: 0,
         viewCount: 0,
         isDraft: true,
-      }
-      setDrafts((prev) => [newDraft, ...prev])
+      };
+      setDrafts((prev) => [newDraft, ...prev]);
     },
-    [],
-  )
+    []
+  );
 
   const deleteDraft = useCallback((id: string) => {
-    setDrafts((prev) => prev.filter((draft) => draft.id !== id))
-  }, [])
+    setDrafts((prev) => prev.filter((draft) => draft.id !== id));
+  }, []);
 
   const getPostById = useCallback(
     (id: string) => {
-      return posts.find((post) => post.id === id)
+      return posts.find((post) => post.id === id);
     },
-    [posts],
-  )
+    [posts]
+  );
 
   const getPostsByTopic = useCallback(
     (topic: string) => {
-      return posts.filter((post) => post.topic === topic)
+      return posts.filter((post) => post.topic === topic);
     },
-    [posts],
-  )
+    [posts]
+  );
 
   const incrementViewCount = useCallback((id: string) => {
-    setPosts((prev) => prev.map((post) => (post.id === id ? { ...post, viewCount: post.viewCount + 1 } : post)))
-  }, [])
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === id ? { ...post, viewCount: post.viewCount + 1 } : post
+      )
+    );
+  }, []);
 
   const searchPosts = useCallback(
     (query: string) => {
-      if (!query.trim()) return []
+      if (!query.trim()) return [];
 
-      const searchTerm = query.toLowerCase().trim()
+      const searchTerm = query.toLowerCase().trim();
       return posts
         .filter((post) => {
           return (
@@ -313,69 +356,69 @@ export function PostsProvider({ children }: { children: ReactNode }) {
             post.content.toLowerCase().includes(searchTerm) ||
             post.author.name.toLowerCase().includes(searchTerm) ||
             post.topic.toLowerCase().includes(searchTerm)
-          )
+          );
         })
         .sort((a, b) => {
           // Sort search results by relevance (title matches first, then content matches)
-          const aInTitle = a.title.toLowerCase().includes(searchTerm)
-          const bInTitle = b.title.toLowerCase().includes(searchTerm)
+          const aInTitle = a.title.toLowerCase().includes(searchTerm);
+          const bInTitle = b.title.toLowerCase().includes(searchTerm);
 
-          if (aInTitle && !bInTitle) return -1
-          if (!aInTitle && bInTitle) return 1
+          if (aInTitle && !bInTitle) return -1;
+          if (!aInTitle && bInTitle) return 1;
 
           // If both or neither have title matches, sort by creation time
           const getTimeValue = (timeStr: string) => {
-            if (timeStr === "刚刚") return Date.now()
+            if (timeStr === "刚刚") return Date.now();
             if (timeStr.includes("分钟前")) {
-              const minutes = Number.parseInt(timeStr.replace("分钟前", ""))
-              return Date.now() - minutes * 60 * 1000
+              const minutes = Number.parseInt(timeStr.replace("分钟前", ""));
+              return Date.now() - minutes * 60 * 1000;
             }
             if (timeStr.includes("小时前")) {
-              const hours = Number.parseInt(timeStr.replace("小时前", ""))
-              return Date.now() - hours * 60 * 60 * 1000
+              const hours = Number.parseInt(timeStr.replace("小时前", ""));
+              return Date.now() - hours * 60 * 60 * 1000;
             }
             if (timeStr.includes("天前")) {
-              const days = Number.parseInt(timeStr.replace("天前", ""))
-              return Date.now() - days * 24 * 60 * 60 * 1000
+              const days = Number.parseInt(timeStr.replace("天前", ""));
+              return Date.now() - days * 24 * 60 * 60 * 1000;
             }
-            return Date.now()
-          }
+            return Date.now();
+          };
 
-          return getTimeValue(b.createdAt) - getTimeValue(a.createdAt)
-        })
+          return getTimeValue(b.createdAt) - getTimeValue(a.createdAt);
+        });
     },
-    [posts],
-  )
+    [posts]
+  );
 
   const sortedPosts = useMemo(() => {
     return [...posts].sort((a, b) => {
       // Sticky posts always come first
-      if (a.isSticky && !b.isSticky) return -1
-      if (!a.isSticky && b.isSticky) return 1
+      if (a.isSticky && !b.isSticky) return -1;
+      if (!a.isSticky && b.isSticky) return 1;
 
       // For posts with same sticky status, sort by creation time
       // Convert relative time strings to comparable values for proper sorting
       const getTimeValue = (timeStr: string) => {
-        if (timeStr === "刚刚") return Date.now()
+        if (timeStr === "刚刚") return Date.now();
         if (timeStr.includes("分钟前")) {
-          const minutes = Number.parseInt(timeStr.replace("分钟前", ""))
-          return Date.now() - minutes * 60 * 1000
+          const minutes = Number.parseInt(timeStr.replace("分钟前", ""));
+          return Date.now() - minutes * 60 * 1000;
         }
         if (timeStr.includes("小时前")) {
-          const hours = Number.parseInt(timeStr.replace("小时前", ""))
-          return Date.now() - hours * 60 * 60 * 1000
+          const hours = Number.parseInt(timeStr.replace("小时前", ""));
+          return Date.now() - hours * 60 * 60 * 1000;
         }
         if (timeStr.includes("天前")) {
-          const days = Number.parseInt(timeStr.replace("天前", ""))
-          return Date.now() - days * 24 * 60 * 60 * 1000
+          const days = Number.parseInt(timeStr.replace("天前", ""));
+          return Date.now() - days * 24 * 60 * 60 * 1000;
         }
         // For other formats, use current time as fallback
-        return Date.now()
-      }
+        return Date.now();
+      };
 
-      return getTimeValue(b.createdAt) - getTimeValue(a.createdAt)
-    })
-  }, [posts])
+      return getTimeValue(b.createdAt) - getTimeValue(a.createdAt);
+    });
+  }, [posts]);
 
   const contextValue = useMemo(
     () => ({
@@ -403,20 +446,24 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       getPostsByTopic,
       incrementViewCount,
       searchPosts,
-    ],
-  )
+    ]
+  );
 
-  return <PostsContext.Provider value={contextValue}>{children}</PostsContext.Provider>
+  return (
+    <PostsContext.Provider value={contextValue}>
+      {children}
+    </PostsContext.Provider>
+  );
 }
 
 export function usePosts() {
-  const context = useContext(PostsContext)
+  const context = useContext(PostsContext);
   if (context === undefined) {
-    throw new Error("usePosts must be used within a PostsProvider")
+    throw new Error("usePosts must be used within a PostsProvider");
   }
-  return context
+  return context;
 }
 
 export function usePostsStore() {
-  return usePosts()
+  return usePosts();
 }
